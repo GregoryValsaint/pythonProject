@@ -2,64 +2,94 @@ from datetime import datetime
 
 class Task:
 
-    def __init__(self):
-        self.id = ""
-        self.content = input("")
+    def __init__(self, content):
+        self.content = content
         self.done = False
         self.created_date = datetime.now()
 
-
-    def display_task(self):
-        print(f"Tache {self.id} :  {self.content}   fait le:  % {self.created_date}")
-
 class Manage(Task):
     def __init__(self):
-        self.list = []
-        self.content = input("")
-        self.response = input('')
-
-    def question(self):
-        while self.response == "exit":
-            if self.response == "list":
-                self.display_list()
-            if self.response == "delete":
-                self.delete_task()
-            if self.response == "add":
-                self.add_task()
-            if self.response == "end":
-                self.validate_task()
-            if self.response == "help":
-                self.help_me()
-
-
-    def display_list(self):
-        print(self.list)
+        self.tasks = []
 
     def add_task(self):
-        task = input('Entrez un tache:')
-        new_task = Task()
-        new_task.content = task
-        list.append(new_task)
+        task_text =input("Nom de la tâche: ")
+        task = Task(task_text)
+        self.tasks.append(task)
 
-
-
-    def delete_task(self):
-        self.list.append()
+    def remove_task(self):
+        try:
+            task_id = int(input("Id de la tâche à supprimer: "))
+            if 0 <= task_id < len(self.tasks):
+                self.tasks.pop(task_id)
+        except ValueError:
+            print("Veuillez rentrer un nombre entre 0 et %i" % (len(self.tasks) - 1))
 
     def validate_task(self):
-        self.list.append()
-    def help_me(self):
-        print('''- list -> liste les messages\n
-                - delete -> demande l'id d'une tache pour la supprimer\n
-                - add -> demande un texte et l'ajoute dans une nouvelle tâche\n
-                - end -> demande l'id d'une tâche pour la valider\n
-                - help -> message d'aide liste de commandes\n
-                - exit -> sortir du programme\n
+        task_id = int(input("Id de la tâche à valider: "))
+        self.tasks[task_id].done = True
+
+    def list_tasks(self):
+        template = "{id} - {date} - {content}[{done}]"
+        for task in self.tasks:
+            print(template.format(
+                id=0,
+                date=task.created_date,
+                content=task.content,
+                done=task.done
+            ))
+
+class UserInterface:
+    def __init__(self):
+        self.manager = Manage()
+        self.loop = True
+
+    def run(self):
+        functions = {
+            "add": self.manager.add_task,
+            "remove": self.manager.remove_task,
+            "validate": self.manager.validate_task,
+            "list": self.manager.list_tasks,
+            "exit": self.manager.exit,
+            "help": self.manager.display_help,
+        }
+
+        self.loop = True
+        while self.loop:
+            user_input = input("Que voulez-vous faire ?\n")
+            # if user_input == "add":
+            #     self.manager.add_task()
+            # elif user_input == "remove":
+            #     self.manager.remove_task()
+            # elif user_input == "validate":
+            #     self.manager.validate_task()
+            # elif user_input == "list":
+            #     self.manager.list_tasks()
+            # elif user_input == "exit":
+            #     self.exit()
+            # else:
+            #     self.display_help()
+            if(user_input in functions):
+                functions[user_input]()
+            else:
+                self.display_help()
+
+    def display_help(self):
+        print('''Aide:
         ''')
 
+    def exit(self):
+        self.loop = False
 
-my_task = Task()
-my_task.display_task()
+# manager = Manage()
+# manager.add_task()
+# manager.add_task()
+# manager.add_task()
+# # manager.list_tasks()
+# manager.remove_task()
+# manager.validate_task()
+# manager.list_tasks()
 
-my_command = Manage()
-my_command.question()
+
+interface = UserInterface()
+interface.run()
+
